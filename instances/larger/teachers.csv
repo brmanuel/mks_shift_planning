@@ -1,0 +1,5 @@
+name;min_shifts;max_shifts;teach_in_limmatplatz;teach_in_altstetten;can_teach_sg;can_teach_ug;avail_mon_am;avail_tue_am;avail_wed_am;avail_thu_am;avail_fri_am;avail_mon_pm;avail_tue_pm;avail_wed_pm;avail_thu_pm;avail_fri_pm;
+t1;4;10;y;n;y;y;y;y;y;n;n;y;y;y;y;y
+t2;6;6;y;n;y;y;n;n;n;y;y;y;y;y;y;y
+t3;4;10;n;y;y;y;y;y;y;n;n;y;y;y;n;n
+t4;4;10;n;y;y;y;y;y;y;y;y;n;n;n;y;y

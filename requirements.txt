@@ -1,0 +1,4 @@
+cffi==1.15.0
+click==8.0.3
+clingo==5.5.1
+pycparser==2.21

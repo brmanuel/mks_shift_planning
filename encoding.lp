@@ -57,45 +57,60 @@ niveau(N) :- student(_,N).
 	
 %% test (hard constraints)
 
-% don't assign more than two teachers to same class
-:- class(B,I,T),
-	 #count { N : assign_shift_teacher(N,B,I,_,T) } > 2.
-
 % only assign one shift at a time to a teacher
 :- assign_shift_teacher(N,B1,I1,D,T),
 	 assign_shift_teacher(N,B2,I2,D,T),
 	 (B1,I1) < (B2,I2).
 
-% plan teachers on days when they're available 
-:- assign_shift_teacher(N,_,_,D,T),
-	 not available_at(N,D,T).
 
 
 %% optimize (soft constraints)
 
+% assign no teacher to a class on only 1 day
+teacher_only_one_day(N,B,I,T) :- class(B,I,T),
+	 teacher_name(N),
+	 #count { D : assign_shift_teacher(N,B,I,D,T) } = 1.
+
+:~ teacher_only_one_day(N,B,I,T). [ 1@5, N,B,I,T]
+
+
+% plan teachers on days when they're available 
+wrong_day_teacher(N,D,T) :- assign_shift_teacher(N,_,_,D,T),
+	 not available_at(N,D,T).
+
+:~ wrong_day_teacher(N,D,T). [ 1@4, N,D,T]
+
 % only assign niveau the teacher can teach
-:~ assign_shift_teacher(N,B,I,D,T),
-	 assign_niveau_class((_,SGUG),B,I,T),
-	 not can_teach_niveau(N, SGUG).
-	 [ 1@3, N,B,I,D,T]
+wrong_niveau_teacher(N,B,I,D,T) :- assign_shift_teacher(N,B,I,D,T),
+		assign_niveau_class((_,SGUG),B,I,T),
+		not can_teach_niveau(N, SGUG).
+
+:~ wrong_niveau_teacher(N,B,I,D,T). [ 1@3, N,B,I,D,T]
 
 % class size
-:~ not L <= #count { S : assign_student_class(S,B,I,T) } <= U,
+wrong_class_size(B,I,T) :- not L <= #count { S : assign_student_class(S,B,I,T) } <= U,
 	 class(B,I,T),
 	 min_class_size(L),
 	 max_class_size(U).
-	 [ 1@2, B,I,T]
+
+:~ wrong_class_size(B,I,T). [ 1@2, B,I,T]
 	 
 % only assign teachers to shifts they like
-:~ assign_shift_teacher(T,B,_,D,T),
-	 not can_teach_at(T,B).
-	 [ 1@1, T,B,D,T]
+wrong_place_teacher(N,B,D,T) :- assign_shift_teacher(N,B,_,D,T),
+	 not can_teach_at(N,B).
 
-:~ teacher(N,L,U,_,_,_,_,_,_,_,_,_,_,_,_,_,_),
+:~ wrong_place_teacher(N,B,D,T). [ 1@1, N,B,D,T]
+
+wrong_num_shifts_teacher(N) :- teacher(N,L,U,_,_,_,_,_,_,_,_,_,_,_,_,_,_),
 	 not L <= #count { B,I,D,T : assign_shift_teacher(N,B,I,D,T) } <= U.
-	 [ 1@1, N]
+
+:~ wrong_num_shifts_teacher(N). [ 1@1, N]
 
 
 %% show
-#show assign_shift_teacher/5.
-#show assign_student_class/4.
+#show wrong_day_teacher/3.
+#show teacher_only_one_day/4.
+#show wrong_niveau_teacher/5.
+#show wrong_class_size/3.
+#show wrong_place_teacher/4.
+#show wrong_num_shifts_teacher/1.
